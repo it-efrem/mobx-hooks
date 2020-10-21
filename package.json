@@ -1,0 +1,25 @@
+{
+  "name": "mobx-hooks",
+  "version": "0.0.1",
+  "description": "MobX Hooks",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/it-efrem/mobx-hooks.git"
+  },
+  "keywords": [
+    "mobx",
+    "hooks",
+    "react",
+    "forms"
+  ],
+  "author": "it-efrem",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/it-efrem/mobx-hooks/issues"
+  },
+  "homepage": "https://github.com/it-efrem/mobx-hooks#readme"
+}
