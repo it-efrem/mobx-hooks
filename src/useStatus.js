@@ -15,6 +15,9 @@ export const useStatus = ({
     value,
     status,
 
+    get isNotUsed() {
+      return this.status === Status.NOT_USED_YET
+    },
     get isPending() {
       return this.status === Status.PENDING
     },
