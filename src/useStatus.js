@@ -10,8 +10,26 @@ export const Status = {
 export const useStatus = ({
                             value,
                             status
-                          } = {}) => observable(
-  {
+                          } = {}) => {
+  function createGetters(value) {
+    if (value !== undefined) {
+      Object.entries(value).forEach(([prop_name, value]) => {
+        if (this[prop_name] === undefined) {
+          Object.defineProperty(this, prop_name, {
+            get: function () {
+              if (this.value !== undefined) {
+                return this.value[prop_name]
+              } else {
+                return undefined
+              }
+            }
+          })
+        }
+      })
+    }
+  }
+
+  const obj = {
     value,
     status,
 
@@ -28,20 +46,24 @@ export const useStatus = ({
       return this.status === Status.ERROR
     },
 
-    set(status, value) {
+    set(status, newValue) {
+      createGetters.call(this, newValue)
+
       if (status) {
         this.status = status;
       }
 
-      if (value) {
-        this.value = value;
+      if (newValue) {
+        this.value = newValue;
       }
 
       if (status === Status.ERROR) {
-        console.error(value);
+        console.error(newValue);
       }
     },
     setValue(newValue) {
+      createGetters.call(this, newValue)
+
       return this.value = newValue
     },
     setStatus(newValue) {
@@ -51,11 +73,19 @@ export const useStatus = ({
       this.value = value;
       this.status = status;
     }
-  },
-  {
-    set: action.bound,
-    setValue: action.bound,
-    setStatus: action.bound,
-    reset: action.bound,
   }
-);
+
+  // constructor
+  createGetters.call(this, obj.value)
+
+  // ToDo: use makeAutoObservable
+  return observable(
+    obj,
+    {
+      set: action.bound,
+      setValue: action.bound,
+      setStatus: action.bound,
+      reset: action.bound,
+    }
+  )
+};
