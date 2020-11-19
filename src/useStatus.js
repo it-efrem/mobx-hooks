@@ -1,4 +1,4 @@
-import {action, observable} from "mobx"
+import {makeAutoObservable} from "mobx";
 
 export const Status = {
   NOT_USED_YET: 'NOT_USED_YET',
@@ -8,17 +8,22 @@ export const Status = {
 };
 
 export const useStatus = ({
-                            value,
-                            status
+                            value: initial_value,
+                            status: initial_status
                           } = {}) => {
+  // ToDo: use autobind for methods
+
+  const symbol_value = "value" //Symbol("value")
+  const symbol_status = "status" //Symbol("status")
+
   function createGetters(value) {
     if (value !== undefined) {
       Object.entries(value).forEach(([prop_name, value]) => {
         if (this[prop_name] === undefined) {
           Object.defineProperty(this, prop_name, {
             get: function () {
-              if (this.value !== undefined) {
-                return this.value[prop_name]
+              if (this[symbol_value] !== undefined) {
+                return this[symbol_value][prop_name]
               } else {
                 return undefined
               }
@@ -30,62 +35,45 @@ export const useStatus = ({
   }
 
   const obj = {
-    value,
-    status,
+    [symbol_value]: initial_value,
+    [symbol_status]: initial_status,
 
     get isNotUsed() {
-      return this.status === Status.NOT_USED_YET
+      return this[symbol_status] === Status.NOT_USED_YET
     },
     get isPending() {
-      return this.status === Status.PENDING
+      return this[symbol_status] === Status.PENDING
     },
     get isReady() {
-      return this.status === Status.READY
+      return this[symbol_status] === Status.READY
     },
     get isError() {
-      return this.status === Status.ERROR
+      return this[symbol_status] === Status.ERROR
     },
 
-    set(status, newValue) {
+    set(newStatus, newValue) {
+      this.setStatus(newStatus);
+      this[symbol_value] = newValue;
       createGetters.call(this, newValue)
-
-      if (status) {
-        this.status = status;
-      }
-
-      if (newValue) {
-        this.value = newValue;
-      }
-
-      if (status === Status.ERROR) {
-        console.error(newValue);
-      }
     },
     setValue(newValue) {
+      this[symbol_value] = newValue
       createGetters.call(this, newValue)
-
-      return this.value = newValue
     },
     setStatus(newValue) {
-      this.status = newValue
+      // ToDo: enum check
+      this[symbol_status] = newValue
     },
     reset() {
-      this.value = value;
-      this.status = status;
+      this[symbol_value] = initial_value;
+      this[symbol_status] = initial_status;
     }
   }
 
   // constructor
-  createGetters.call(this, obj.value)
+  createGetters.call(obj, obj[symbol_value])
 
-  // ToDo: use makeAutoObservable
-  return observable(
-    obj,
-    {
-      set: action.bound,
-      setValue: action.bound,
-      setStatus: action.bound,
-      reset: action.bound,
-    }
-  )
+  // ToDo: makeAutoObservable didn't work with Symbol
+  //  See: https://github.com/mobxjs/mobx/issues/2628
+  return makeAutoObservable(obj)
 };

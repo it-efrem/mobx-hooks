@@ -1,6 +1,6 @@
 {
   "name": "mobx-hooks",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "MobX Hooks",
   "main": "src/index.js",
   "scripts": {
