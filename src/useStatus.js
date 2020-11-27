@@ -17,10 +17,12 @@ export const useStatus = ({
   const symbol_status = "status" //Symbol("status")
 
   function createGetters(value) {
-    if (value !== undefined) {
-      Object.entries(value).forEach(([prop_name, value]) => {
+    // ToDo: check for other types
+    if (typeof value === "object") {
+      Object.keys(value).forEach((prop_name) => {
         if (this[prop_name] === undefined) {
           Object.defineProperty(this, prop_name, {
+            configurable: true,
             get: function () {
               if (this[symbol_value] !== undefined) {
                 return this[symbol_value][prop_name]
@@ -51,6 +53,14 @@ export const useStatus = ({
       return this[symbol_status] === Status.ERROR
     },
 
+    getStatus() {
+      return this[symbol_status]
+    },
+    getValue() {
+      return this[symbol_value]
+    },
+
+    // ToDo: if newValue is string, observer don't react on change
     set(newStatus, newValue) {
       this.setStatus(newStatus);
       this[symbol_value] = newValue;
